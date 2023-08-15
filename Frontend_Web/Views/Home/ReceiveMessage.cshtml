@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "ReceiveMessage";
+}
+
+
+@{
+    var textFormat = @ViewBag.TextFormat;
+    var cssClass = "text-format-" + textFormat.ColorValue.ToLower() + "-" + textFormat.FontStyle.ToLower();
+}
+
+<style>
+    .@cssClass {
+        color: @textFormat.ColorValue;
+        font-style: @textFormat.FontStyle;
+        font-family: @textFormat.FontName;
+        font-weight: @textFormat.FontWeight;
+        font-size: @textFormat.FontSize;
+    }
+</style>
+
+
+<html>
+<head>
+    <!-- include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div>
+    <h2>State</h2>
+    <h5>@ViewBag.PageContent</h5>
+    <h5>@TempData["PageContent"]</h5>
+    <h4>model: @Model</h4>
+   @*  <h4>model with page content: @Model.PageContent</h4> *@
+    <hr />
+    <h2>Formatted State</h2>
+    <p class="@cssClass">@ViewBag.PageContent</p>
+</div>
+
+
+<hr /><hr />
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Enter your message below and press send.</p>
+    <input id="messageInput" type="text" />
+    <button id="sendButton">Send</button>
+    <ul id="messagesList"></ul>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script>
+
+        // Create a hub connection object
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7088/PageContentHub", {
+                // Use WebSockets as transport type
+                transport: signalR.HttpTransportType.WebSockets
+            })
+            .build();
+
+        // Start the connection
+        connection.start()  
+            .then(() => console.log("Connected to the hub."))
+            .catch(err => console.error(err.toString()));
+
+        // Register handlers for receiving messages
+        connection.on("ReceiveMessage", (message) => {
+            // Append the message to the list
+            const li = document.createElement("li");
+            li.textContent = message;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.on("Welcome", (message) => {
+            // Show a welcome message
+            alert(message);
+        });
+
+        connection.on("Goodbye", (message) => {
+            // Show a goodbye message
+            alert(message);
+        });
+
+        // Get the send button and input elements
+        const sendButton = document.getElementById("sendButton");
+        const messageInput = document.getElementById("messageInput");
+
+        // Add a click event listener to the send button
+        sendButton.addEventListener("click", (event) => {
+            debugger;
+            // Get the message from the input
+            const message = messageInput.value;
+            // Send the message to the hub
+            connection.invoke("SendMessage", message)
+                .catch(err => console.error(err.toString()));
+            // Clear the input
+            messageInput.value = "";
+            event.preventDefault();
+        });
+    </script>
+    }
+</body>
+</html>
