@@ -72,10 +72,6 @@ namespace Frontend_WinForms
             });
             await hubConnection.StartAsync();
             await hubConnection.InvokeAsync("SendMessage", message_from_winForm);
-
-
-
-
         }
     }
 }
