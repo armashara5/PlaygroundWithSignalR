@@ -68,7 +68,7 @@ namespace Frontend_WinForms
                 .Build();
             hubConnection.On<string>("ReceiveMessage", (message) =>
             {
-                Console.WriteLine($"Received: {message}");
+                MessageBox.Show($"I am showing the following message as incoming message from hubconnection {message}");
             });
             await hubConnection.StartAsync();
             await hubConnection.InvokeAsync("SendMessage", message_from_winForm);
