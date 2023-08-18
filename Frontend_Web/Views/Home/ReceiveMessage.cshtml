@@ -3,6 +3,7 @@
 }
 
 
+
 @{
     var textFormat = @ViewBag.TextFormat;
     var cssClass = "text-format-" + textFormat.ColorValue.ToLower() + "-" + textFormat.FontStyle.ToLower();
@@ -18,26 +19,16 @@
     }
 </style>
 
-
-<html>
-<head>
-    <!-- include jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body>
 <div>
     <h2>State</h2>
     <h5>@ViewBag.PageContent</h5>
-    <h5>@TempData["PageContent"]</h5>
-    <h4>model: @Model</h4>
-   @*  <h4>model with page content: @Model.PageContent</h4> *@
     <hr />
     <h2>Formatted State</h2>
     <p class="@cssClass">@ViewBag.PageContent</p>
+
 </div>
+<hr />
 
-
-<hr /><hr />
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
@@ -101,5 +92,3 @@
         });
     </script>
     }
-</body>
-</html>

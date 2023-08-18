@@ -1,4 +1,6 @@
+using Backend.Hubs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Net.Http.Headers;
 
 namespace Backend.Controllers
@@ -9,20 +11,13 @@ namespace Backend.Controllers
     {
 
         private readonly ILogger<DevzWebController> _logger;
+        private readonly IHubContext<PageContentHub> _hubContext;
 
-        public DevzWebController(ILogger<DevzWebController> logger)
+        public DevzWebController(ILogger<DevzWebController> logger, IHubContext<PageContentHub> hubContext)
         {
             _logger = logger;
+            _hubContext = hubContext;
         }
-
-        //[HttpGet(Name = "Off_Screen"), Route("Off")]
-        //public PageContent Off()
-        //{
-        //    return new PageContent
-        //    {
-        //        Text = "Off"
-        //    };
-        //}
 
         [HttpGet("Welcome")]
         public PageContent Welcome()
@@ -42,42 +37,11 @@ namespace Backend.Controllers
         public async Task<IActionResult> PostTestMessage([FromBody] PageContent message_from_winform)
         {
 
+            // Call the hub method
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message_from_winform.Text);
 
-            // Create an HttpClient instance
-            HttpClient client = new HttpClient();
-
-            // Set the base address
-            client.BaseAddress = new Uri("https://localhost:7121/");
-
-            // Set the accept header to JSON
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // Send a POST request to the mvc application with the message_from_winform object
-            HttpResponseMessage response = await client.PostAsJsonAsync("Home/ReceiveMessage", message_from_winform);
-
-            // Check the response status code and read the content
-            if (response.IsSuccessStatusCode)
-            {
-                // Read the response as a string
-                string result = await response.Content.ReadAsStringAsync();
-
-                //// Update the view with the result
-                //$("#message").html(result);
-
-                //// Read the response as a string
-                //string result = await response.Content.ReadAsStringAsync();
-
-                //// Do something with the result
-                return Ok(result);
-                ////Console.WriteLine(result);
-            }
-            else
-            {
-                // Handle the error
-                //Console.WriteLine(response.StatusCode);
-                return BadRequest(response.StatusCode);
-            }
-
+            // Return some result
+            return Ok();
         }
 
         private TextFormat GetTextFormat()

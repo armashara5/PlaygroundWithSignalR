@@ -16,9 +16,24 @@ namespace Frontend_WinForms
             InitializeComponent();
         }
 
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            const string message_from_winForm = "I am the message from winform app by SignalR";
+            var hubConnection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7088/PageContentHub")
+                .Build();
+            hubConnection.On<string>("ReceiveMessage", (message) =>
+            {
+                Console.WriteLine($"Received: {message}");
+            });
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("SendMessage", message_from_winForm);
+
+        }
+
         private async void button2_Click(object sender, EventArgs e)
         {
-            const string message_from_winForm = "I am the message from winform app";
+            const string message_from_winForm = "I am the message from winform app by HttpClient";
             //using (var client = new HttpClient())
             //{
             //    var content = new StringContent(message_from_winForm);
@@ -50,8 +65,6 @@ namespace Frontend_WinForms
 
                 // Do something with the result
                 Console.WriteLine(result);
-                //Console.WriteLine(result.text);
-                //Console.WriteLine(result.textFormat);
             }
             else
             {
@@ -60,18 +73,6 @@ namespace Frontend_WinForms
             }
         }
 
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            const string message_from_winForm = "I am the message from winform app";
-            var hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7088/PageContentHub")
-                .Build();
-            hubConnection.On<string>("ReceiveMessage", (message) =>
-            {
-                MessageBox.Show($"I am showing the following message as incoming message from hubconnection {message}");
-            });
-            await hubConnection.StartAsync();
-            await hubConnection.InvokeAsync("SendMessage", message_from_winForm);
-        }
+
     }
 }
